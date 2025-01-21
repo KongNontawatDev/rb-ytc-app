@@ -136,11 +136,9 @@ export default function Home({}: Props) {
 				<Flex gap={10} className="w-full overflow-x-scroll pt-2 pb-3">
 					{roomEmpty?.data?.map((item: any) => (
 						<Link to={`/room/${item.id}`}>
-							<div className="max-w-[230px] rounded-md shadow-md">
+							<div className="w-[230px] max-w-[230px] rounded-md shadow-md">
 								{item.room_image && (
-									<Image
-										fallback={fallbackImage}
-										preview={false}
+									<img
 										className="w-full max-h-28 object-cover rounded-md"
 										src={getImage(item.room_image[0]?.image, "room")}
 										alt="Sunset in the mountains"
@@ -184,9 +182,7 @@ export default function Home({}: Props) {
 						<Link to={`/room/${item.id}`}>
 							<div className="w-[230px] max-w-[230px] rounded-md shadow-md">
 								{item.room_image && (
-									<Image
-										fallback={fallbackImage}
-										preview={false}
+									<img
 										className="w-full max-h-28 object-cover rounded-md"
 										src={getImage(item.room_image[0]?.image, "room")}
 										alt="Sunset in the mountains"

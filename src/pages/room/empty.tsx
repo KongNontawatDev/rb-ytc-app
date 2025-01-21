@@ -38,15 +38,13 @@ export default function Empty({}: Props) {
 					{roomEmpty?.data?.map((item: any) => (
 						<Link to={`/room/${item.id}`}>
 							<div className="w-full rounded-md shadow-md">
-								{item.room_image&&<Image
-                  fallback={fallbackImage}
-                  preview={false}
+								{item.room_image&&<img
 									className="w-full object-cover rounded-md"
 									src={getImage(item.room_image[0]?.image, "room")}
 									alt="Sunset in the mountains"
 								/>}
 								<div className="p-2">
-									<p className="line-clamp-2">{item.name}</p>
+								<p className="text-lg font-medium line-clamp-2">{item.name}</p>
 									<p className="text-gray-600 text-xs line-clamp-1">
 										<EnvironmentFilled className="me-1" />
 										{item.location}
