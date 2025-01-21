@@ -3,6 +3,7 @@ import { Button, Tooltip } from "antd";
 import { ButtonSize, ButtonType } from "antd/es/button";
 import { TooltipPlacement } from "antd/es/tooltip";
 import PopconfirmCancel from "./ConfirmCancel";
+import { HTMLProps } from "react";
 
 type Props = {
 	title?: string | null;
@@ -14,6 +15,7 @@ type Props = {
 	block?: boolean;
 	onCancel: () => Promise<void>;
 	placement?: TooltipPlacement;
+		className?: HTMLProps<HTMLElement>["className"];
 };
 
 export default function ButtonCancelAction({
@@ -25,6 +27,7 @@ export default function ButtonCancelAction({
 	placement = "top",
 	data,
 	block = false,
+	className,
 	onCancel,
 }: Props) {
 	if (title) {
@@ -37,6 +40,7 @@ export default function ButtonCancelAction({
 				<Button
 					type={type}
 					block={block}
+											className={className}
 					icon={<CloseOutlined />}
 					size={size}
 					danger={danger}
@@ -54,6 +58,7 @@ export default function ButtonCancelAction({
 			>
 				<Tooltip title={tooltip}>
 					<Button
+						className={className}
 						type={type}
 						block={block}
 						icon={<CloseOutlined />}

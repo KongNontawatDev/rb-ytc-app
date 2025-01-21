@@ -31,10 +31,10 @@ export const useUpdateBooking = (handleSuccess: () => void) => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async (updateBookingData: Booking) => {
+		mutationFn: async (id: number) => {
 			const { data } = await api.patch(
-				`/app/booking_list/${updateBookingData.id}`,
-				updateBookingData
+				`/app/booking_list/update/status/${id}`,
+				{status:3}
 			);
 			if (!data) throw new Error("Booking updated fail");
 			return data;

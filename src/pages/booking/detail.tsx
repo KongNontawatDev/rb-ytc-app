@@ -10,6 +10,8 @@ import { DescriptionsProps } from "antd/lib";
 import { getImage } from "../room/hooks/useRoomQuery";
 import { useAuthStore } from "../auth/hooks/useAuthStore";
 import BadgeStatus from "./components/BadgeStatus";
+import { useUpdateBooking } from "./hooks/useBookingMutate";
+import ButtonCancelAction from "../../components/common/ButtonCancelAction";
 
 type Props = {};
 
@@ -18,6 +20,7 @@ export default function BookingDetail({}: Props) {
 	const { id } = useParams<"id">();
 	const [booking, setBooking] = useState<Booking>();
 	const { data, isPending } = useBookingById(Number(id));
+	const cancelBooking = useUpdateBooking(()=>{})
 	const {user} = useAuthStore()
   	useEffect(() => {
 		if (data && !isPending) {
@@ -119,6 +122,7 @@ export default function BookingDetail({}: Props) {
 			</Flex>
       <Spin spinning={isPending}>
 					<Descriptions size="small" bordered items={items} className="my-5" />
+					{booking?.status!==3&&<ButtonCancelAction data="รายการจอง" title={"ยกเลิกจอง"} type="dashed" danger block className="mt-5" onCancel={async()=>cancelBooking.mutateAsync(booking?.id!)}/>}
 				</Spin>
 		</div>
 	);
