@@ -7,9 +7,9 @@ import { LeftOutlined } from "@ant-design/icons";
 import { fallbackImage } from "../../utils/file";
 import { toDateTime } from "../../utils/dateFunction";
 import { DescriptionsProps } from "antd/lib";
-import BadgeActive from "../../components/common/BadgeActive";
 import { getImage } from "../room/hooks/useRoomQuery";
 import { useAuthStore } from "../auth/hooks/useAuthStore";
+import BadgeStatus from "./components/BadgeStatus";
 
 type Props = {};
 
@@ -73,7 +73,7 @@ export default function BookingDetail({}: Props) {
 		{
 			key: "สถานะรายการจอง",
 			label: "สถานะรายการจอง",
-			children: <BadgeActive value={String(booking?.status)} />,
+			children: <BadgeStatus value={String(booking?.status)} />,
 			span: 3,
 		},
 		{
