@@ -80,7 +80,7 @@ export const getImage = (filename: string, folder: string) => {
 		if (filename.includes("https")) {
 			return filename;
 		}
-		return `http://localhost:3000/${folder}/${filename}`;
+		return `${import.meta.env.VITE_API_URL}/${folder}/${filename}`;
 	}else {
 		return ""
 	}
