@@ -47,7 +47,7 @@ export default function Detail({}: Props) {
 						onClick={() => navigate("/")}
 					/>
 				</Flex>
-				<Typography.Text>รายละเอียดห้อง</Typography.Text>
+				<Typography.Title level={5}>รายละเอียดห้อง</Typography.Title>
 				<Link to={"/profile"}>
 					<Image
 						src={getImage(user?.image!, "user")}

@@ -15,8 +15,13 @@ export default function AntDesignProvider({ children }: { children: ReactElement
 			theme={{
 				token: {
 					fontFamily: "Kanit",
-					colorPrimary:'#007bff'
+					colorPrimary:'#007bff',
 				},
+				components:{
+					Typography:{
+						fontWeightStrong:400
+					}
+				}
 			}}
 			locale={languageStore.locale=="th"?localeTH:localeEN}
 		>

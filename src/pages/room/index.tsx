@@ -21,7 +21,7 @@ export default function Room({}: Props) {
 						onClick={() => navigate("/")}
 					/>
 				</Flex>
-				<Typography.Text>ห้องประชุมทั้งหมด</Typography.Text>
+				<Typography.Title level={5}>ห้องประชุมทั้งหมด</Typography.Title>
 				<Link to={"/profile"}>
 					<Image
 						src={getImage(user?.image!, "user")}

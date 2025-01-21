@@ -21,7 +21,7 @@ export default function Empty({}: Props) {
 						onClick={() => navigate("/")}
 					/>
 				</Flex>
-				<Typography.Text>ห้องประชุมว่างวันนี้</Typography.Text>
+				<Typography.Title level={5}>ห้องประชุมว่างวันนี้</Typography.Title>
 				<Link to={"/profile"}>
 					<Image
 						src={getImage(user?.image!, "user")}

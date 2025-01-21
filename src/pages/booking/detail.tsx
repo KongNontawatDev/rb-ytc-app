@@ -106,7 +106,7 @@ export default function BookingDetail({}: Props) {
 						onClick={() => navigate("/")}
 					/>
 				</Flex>
-				<Typography.Text>รายละเอียดการจอง</Typography.Text>
+				<Typography.Title level={5}>รายละเอียดการจอง</Typography.Title>
 				<Link to={"/profile"}>
 					<Image
 						src={getImage(user?.image!, "user")}

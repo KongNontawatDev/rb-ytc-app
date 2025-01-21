@@ -124,7 +124,7 @@ export default function BookingPage({}: Props) {
 						onClick={() => navigate("/")}
 					/>
 				</Flex>
-				<Typography.Text>จองห้อง</Typography.Text>
+				<Typography.Title level={5}>จองห้อง</Typography.Title>
 				<Link to={"/profile"}>
 					<Image
 						src={getImage(user?.image!, "user")}

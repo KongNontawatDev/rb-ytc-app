@@ -35,7 +35,7 @@ export default function History({}: Props) {
 						onClick={() => navigate("/")}
 					/>
 				</Flex>
-				<Typography.Text>ประวัติการจอง</Typography.Text>
+				<Typography.Title level={5}>ประวัติการจอง</Typography.Title>
 				<Link to={"/profile"}>
 					<Image
 						src={getImage(user?.image!, "user")}

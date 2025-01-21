@@ -109,7 +109,7 @@ const Register: React.FC = () => {
 	return (
 		<div className="px-4 pt-4">
 			<Card hoverable>
-				<Typography.Title level={5} className="text-center">
+				<Typography.Title level={4} className="text-center">
 					<EditOutlined /> ลงทะเบียนใช้งาน
 				</Typography.Title>
 				<Typography.Text className="block text-center">

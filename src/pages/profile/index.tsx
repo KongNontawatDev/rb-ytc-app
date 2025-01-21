@@ -124,7 +124,7 @@ export default function Profile({}: Props) {
 						onClick={() => navigate("/")}
 					/>
 				</Flex>
-				<Typography.Text>โปรไฟล์</Typography.Text>
+				<Typography.Title level={5}>โปรไฟล์</Typography.Title>
 				<span> </span>
 			</Flex>
 			<Spin spinning={isPending}>
