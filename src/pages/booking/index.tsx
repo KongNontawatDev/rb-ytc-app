@@ -1,4 +1,4 @@
-import { LeftOutlined } from "@ant-design/icons";
+import { CheckOutlined, LeftOutlined } from "@ant-design/icons";
 import {
 	Button,
 	Col,
@@ -87,7 +87,7 @@ export default function BookingPage({}: Props) {
 		try {
 			setIsSaving(true);
 			if (mode === "edit" && id) {
-				await updateBooking.mutateAsync({ id: Number(id), ...values });
+				await updateBooking.mutateAsync(Number(id));
 			} else {
 				await createBooking.mutateAsync({
 					...values,
@@ -346,7 +346,8 @@ export default function BookingPage({}: Props) {
 									type="primary"
 									disabled={!isDirty || isSaving}
 									loading={isSaving}
-									title={"บันทึกข้อมูล"}
+									icon={<CheckOutlined/>}
+									title={"ยืนยันการจอง"}
 									size="large"
 									block
 								/>

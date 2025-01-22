@@ -47,7 +47,7 @@ export default function History({}: Props) {
 				</Link>
 			</Flex>
 			<Spin spinning={isPending}>
-				<Row>
+				<Row gutter={[10,10]}>
 					{data?.data?.map((item: Booking) => (
 						<Col span={24}>
 							<Link to={"/booking/detail/" + item.id}>

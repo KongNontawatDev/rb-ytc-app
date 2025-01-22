@@ -8,36 +8,44 @@ const ProtectedRoute = () => {
   const location = useLocation()
   const { user, setAuth } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
+  const [shouldRedirect, setShouldRedirect] = useState(false)
 
   useEffect(() => {
     const checkAuth = async () => {
+      // If user exists in store, no need to check further
       if (user) {
         setIsLoading(false)
         return
       }
 
       try {
+        // Get LINE user profile
         const liffUser = await liff.getProfile()
+        
+        // Check if user exists in database
         const response = await api.post('/app/auth/check_register', {
           line_id: liffUser.userId
         })
 
-        if (response.status === 200) {
-          setAuth(response.data?.data)
+        // If user found in database, store in auth store
+        if ((response.status === 200 && response.data?.data) || response.status === 201) {
+          setAuth(response.data.data)
+          setShouldRedirect(false)
         }
       } catch (error: any) {
-        if (error.response?.status === 304) {
-          window.location.href = '/auth/register'
-          return
-        }
         console.error('Auth check failed:', error)
+        
+        // If user not found in database (304) or other errors
+        if (error.response?.status === 304 || error.response?.status === 404) {
+          setShouldRedirect(true)
+        }
       } finally {
         setIsLoading(false)
       }
     }
 
     checkAuth()
-  }, [user, setAuth])
+  }, [user, setAuth, location])
 
   // Skip protection for register path
   if (location.pathname === '/auth/register') {
@@ -48,11 +56,18 @@ const ProtectedRoute = () => {
     return <div>Loading...</div>
   }
 
-  if (!user) {
+  // Redirect to register if no user found in store and database
+  if (!user && shouldRedirect) {
     return <Navigate to="/auth/register" replace />
   }
 
-  return <Outlet />
+  // Allow access if user exists in store
+  if (user) {
+    return <Outlet />
+  }
+
+  // Show loading while checking database
+  return <div>Loading...</div>
 }
 
 export default ProtectedRoute
