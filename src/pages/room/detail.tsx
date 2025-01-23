@@ -62,11 +62,10 @@ export default function Detail({}: Props) {
 				<Carousel arrows infinite={true} className="max-h-80 rounded-md">
 					{room?.room_image.map((room_image) => (
 						<div className="rounded-md">
-							<Image
+							<img
 								src={getImage(room_image.image, "room")}
 								className="w-full max-h-80 object-cover rounded-md"
-								preview={false}
-								fallback={fallbackImage}
+								alt={room.name}
 							/>
 						</div>
 					))}
