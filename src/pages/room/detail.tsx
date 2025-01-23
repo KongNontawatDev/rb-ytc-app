@@ -65,7 +65,7 @@ export default function Detail({}: Props) {
 							<img
 								src={getImage(room_image.image, "room")}
 								className="w-full max-h-80 object-cover rounded-md"
-								alt={room.name}
+								alt={room?.name}
 							/>
 						</div>
 					))}
