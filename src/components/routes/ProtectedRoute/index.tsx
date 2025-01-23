@@ -8,46 +8,43 @@ const ProtectedRoute = () => {
   const location = useLocation()
   const { user, setAuth } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
-  const [shouldRedirect, setShouldRedirect] = useState(false)
 
   useEffect(() => {
     const checkAuth = async () => {
-      // If user exists in store, no need to check further
       if (user) {
         setIsLoading(false)
         return
       }
+      // else {
+      //   const liffUser = await liff.getProfile()
+      //   const response = await api.post('/app/auth/check_register', {
+      //     line_id: liffUser.userId
+      //   })
+
+      //   if (response.status === 200 && response.data?.data) {
+      //     setAuth(response.data.data)
+      //   }
+      // }
 
       try {
-        // Get LINE user profile
         const liffUser = await liff.getProfile()
-        
-        // Check if user exists in database
         const response = await api.post('/app/auth/check_register', {
           line_id: liffUser.userId
         })
 
-        // If user found in database, store in auth store
-        if ((response.status === 200 && response.data?.data) || response.status === 201) {
+        if (response.status === 200 && response.data?.data) {
           setAuth(response.data.data)
-          setShouldRedirect(false)
         }
       } catch (error: any) {
         console.error('Auth check failed:', error)
-        
-        // If user not found in database (304) or other errors
-        if (error.response?.status === 304 || error.response?.status === 404) {
-          setShouldRedirect(true)
-        }
       } finally {
         setIsLoading(false)
       }
     }
 
     checkAuth()
-  }, [user, setAuth, location])
+  }, [user, setAuth])
 
-  // Skip protection for register path
   if (location.pathname === '/auth/register') {
     return <Outlet />
   }
@@ -56,18 +53,11 @@ const ProtectedRoute = () => {
     return <div>Loading...</div>
   }
 
-  // Redirect to register if no user found in store and database
-  if (!user && shouldRedirect) {
+  if (!user) {
     return <Navigate to="/auth/register" replace />
   }
 
-  // Allow access if user exists in store
-  if (user) {
-    return <Outlet />
-  }
-
-  // Show loading while checking database
-  return <div>Loading...</div>
+  return <Outlet />
 }
 
 export default ProtectedRoute
