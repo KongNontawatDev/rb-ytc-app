@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { EnvironmentFilled, LeftOutlined } from "@ant-design/icons";
 import { getImage, useRoomEmpty } from "./hooks/useRoomQuery";
 import { useAuthStore } from "../auth/hooks/useAuthStore";
+import EmptyData from "../../components/common/EmptyData";
 
 type Props = {};
 
@@ -33,7 +34,7 @@ export default function Empty({}: Props) {
 				</Link>
 			</Flex>
 
-			<Spin spinning={roomEmptyIsPending}>
+			{roomEmpty?.data?.length>0?<Spin spinning={roomEmptyIsPending}>
 				<Flex vertical gap={15} className="w-full overflow-x-scroll pt-2 pb-3">
 					{roomEmpty?.data?.map((item: any) => (
 						<Link to={`/room/${item.id}`}>
@@ -66,7 +67,7 @@ export default function Empty({}: Props) {
 						</Link>
 					))}
 				</Flex>
-			</Spin>
+			</Spin>:<EmptyData/>}
 		</div>
 	);
 }

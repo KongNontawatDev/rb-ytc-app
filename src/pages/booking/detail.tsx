@@ -12,6 +12,7 @@ import { useAuthStore } from "../auth/hooks/useAuthStore";
 import BadgeStatus from "./components/BadgeStatus";
 import { useUpdateBooking } from "./hooks/useBookingMutate";
 import ButtonCancelAction from "../../components/common/ButtonCancelAction";
+import EmptyData from "../../components/common/EmptyData";
 
 type Props = {};
 
@@ -121,8 +122,8 @@ export default function BookingDetail({}: Props) {
 				</Link>
 			</Flex>
       <Spin spinning={isPending}>
-					<Descriptions size="small" bordered items={items} className="my-5" />
-					{booking?.status!==3&&<ButtonCancelAction data="รายการจอง" title={"ยกเลิกจอง"} type="dashed" danger block className="mt-5" onCancel={async()=>cancelBooking.mutateAsync(booking?.id!)}/>}
+					{!booking||!id?<EmptyData/>:<Descriptions size="small" bordered items={items} className="my-5" />}
+					{(booking?.status!==3&&(booking&&id))&&<ButtonCancelAction data="รายการจอง" title={"ยกเลิกจอง"} type="dashed" danger block className="mt-5" onCancel={async()=>cancelBooking.mutateAsync(booking?.id!)}/>}
 				</Spin>
 		</div>
 	);

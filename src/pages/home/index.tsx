@@ -14,6 +14,7 @@ import { getImage, useRoomAll, useRoomEmpty } from "../room/hooks/useRoomQuery";
 import { useBookingCurrentMonth } from "../booking/hooks/useBookingQuery";
 import { Booking } from "../booking/types";
 import { toDateTime } from "../../utils/dateFunction";
+import EmptyData from "../../components/common/EmptyData";
 
 type Props = {};
 
@@ -132,41 +133,46 @@ export default function Home({}: Props) {
 					ดูทั้งหมด <RightOutlined />
 				</Link>
 			</Flex>
+
 			<Spin spinning={roomEmptyIsPending}>
-				<Flex gap={10} className="w-full overflow-x-scroll pt-2 pb-3">
-					{roomEmpty?.data?.map((item: any) => (
-						<Link to={`/room/${item.id}`}>
-							<div className="w-[230px] max-w-[230px] rounded-md shadow-md">
-								{item.room_image && (
-									<img
-										className="w-full max-h-28 object-cover rounded-md"
-										src={getImage(item.room_image[0]?.image, "room")}
-										alt="Sunset in the mountains"
-									/>
-								)}
-								<div className="p-2">
-									<p className="line-clamp-2">{item.name}</p>
-									<p className="text-gray-600 text-xs line-clamp-1">
-										<EnvironmentFilled className="me-1" />
-										{item.location}
-									</p>
+				{roomEmpty?.data.length > 0 ? (
+					<Flex gap={10} className="w-full overflow-x-scroll pt-2 pb-3">
+						{roomEmpty?.data?.map((item: any) => (
+							<Link to={`/room/${item.id}`}>
+								<div className="w-[230px] max-w-[230px] rounded-md shadow-md">
+									{item.room_image && (
+										<img
+											className="w-full max-h-28 object-cover rounded-md"
+											src={getImage(item.room_image[0]?.image, "room")}
+											alt="Sunset in the mountains"
+										/>
+									)}
+									<div className="p-2">
+										<p className="line-clamp-2">{item.name}</p>
+										<p className="text-gray-600 text-xs line-clamp-1">
+											<EnvironmentFilled className="me-1" />
+											{item.location}
+										</p>
+									</div>
+									<Flex
+										className="px-2 pb-2"
+										justify="space-between"
+										align="center"
+									>
+										<Tag color="blue" className="rounded-full px-1 -py-1">
+											<small>ห้อง{item.size}</small>
+										</Tag>
+										<Tag color="green" className="rounded-full px-1 -py-1">
+											<small>จุได้ {item.capacity} คน</small>
+										</Tag>
+									</Flex>
 								</div>
-								<Flex
-									className="px-2 pb-2"
-									justify="space-between"
-									align="center"
-								>
-									<Tag color="blue" className="rounded-full px-1 -py-1">
-										<small>ห้อง{item.size}</small>
-									</Tag>
-									<Tag color="green" className="rounded-full px-1 -py-1">
-										<small>จุได้ {item.capacity} คน</small>
-									</Tag>
-								</Flex>
-							</div>
-						</Link>
-					))}
-				</Flex>
+							</Link>
+						))}
+					</Flex>
+				) : (
+					<EmptyData />
+				)}
 			</Spin>
 
 			{/* Room All List */}
@@ -177,40 +183,44 @@ export default function Home({}: Props) {
 				</Link>
 			</Flex>
 			<Spin spinning={roomAllIsPending}>
-				<Flex gap={10} className="w-full overflow-x-scroll pt-2 pb-3">
-					{roomAll?.data?.map((item: any) => (
-						<Link to={`/room/${item.id}`}>
-							<div className="w-[230px] max-w-[230px] rounded-md shadow-md">
-								{item.room_image && (
-									<img
-										className="w-full max-h-28 object-cover rounded-md"
-										src={getImage(item.room_image[0]?.image, "room")}
-										alt="Sunset in the mountains"
-									/>
-								)}
-								<div className="p-2">
-									<p className="line-clamp-2">{item.name}</p>
-									<p className="text-gray-600 text-xs line-clamp-1">
-										<EnvironmentFilled className="me-1" />
-										{item.location}
-									</p>
+				{roomAll?.data.length > 0 ? (
+					<Flex gap={10} className="w-full overflow-x-scroll pt-2 pb-3">
+						{roomAll?.data?.map((item: any) => (
+							<Link to={`/room/${item.id}`}>
+								<div className="w-[230px] max-w-[230px] rounded-md shadow-md">
+									{item.room_image && (
+										<img
+											className="w-full max-h-28 object-cover rounded-md"
+											src={getImage(item.room_image[0]?.image, "room")}
+											alt="Sunset in the mountains"
+										/>
+									)}
+									<div className="p-2">
+										<p className="line-clamp-2">{item.name}</p>
+										<p className="text-gray-600 text-xs line-clamp-1">
+											<EnvironmentFilled className="me-1" />
+											{item.location}
+										</p>
+									</div>
+									<Flex
+										className="px-2 pb-2"
+										justify="space-between"
+										align="center"
+									>
+										<Tag color="blue" className="rounded-full px-1 -py-1">
+											<small>ห้อง{item.size}</small>
+										</Tag>
+										<Tag color="green" className="rounded-full px-1 -py-1">
+											<small>จุได้ {item.capacity} คน</small>
+										</Tag>
+									</Flex>
 								</div>
-								<Flex
-									className="px-2 pb-2"
-									justify="space-between"
-									align="center"
-								>
-									<Tag color="blue" className="rounded-full px-1 -py-1">
-										<small>ห้อง{item.size}</small>
-									</Tag>
-									<Tag color="green" className="rounded-full px-1 -py-1">
-										<small>จุได้ {item.capacity} คน</small>
-									</Tag>
-								</Flex>
-							</div>
-						</Link>
-					))}
-				</Flex>
+							</Link>
+						))}
+					</Flex>
+				) : (
+					<EmptyData />
+				)}
 			</Spin>
 
 			{/* Timeline Booking */}
@@ -220,21 +230,26 @@ export default function Home({}: Props) {
 				</Typography.Text>
 			</Flex>
 			<Spin spinning={bookingListCurrentMonthIsPending}>
-				<Timeline
-					className="mb-5 mt-4"
-					items={bookingListCurrentMonth?.data.map((list: Booking) => ({
-						children: (
-							<div className="leading-4">
-								<p>
-									{toDateTime(list?.book_start)} - {toDateTime(list?.book_end)}
-								</p>
-								<small>{list?.title}</small>
-								<br />
-								<small>ผู้จอง : {list?.user_name}</small>
-							</div>
-						),
-					}))}
-				/>
+				{bookingListCurrentMonth?.data.length > 0 ? (
+					<Timeline
+						className="mb-5 mt-4"
+						items={bookingListCurrentMonth?.data.map((list: Booking) => ({
+							children: (
+								<div className="leading-4">
+									<p>
+										{toDateTime(list?.book_start)} -{" "}
+										{toDateTime(list?.book_end)}
+									</p>
+									<small>{list?.title} [{list?.room?.name}]</small>
+									<br />
+									<small>ผู้จอง : {list?.user_name}</small>
+								</div>
+							),
+						}))}
+					/>
+				) : (
+					<EmptyData />
+				)}
 			</Spin>
 		</div>
 	);

@@ -14,7 +14,10 @@ import {
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { fallbackImage } from "../../utils/file";
 import { useEffect, useState } from "react";
-import { useBookingById } from "./hooks/useBookingQuery";
+import {
+	useBookingById,
+	useRoomBookingDatesByRoomId,
+} from "./hooks/useBookingQuery";
 import { useCreateBooking, useUpdateBooking } from "./hooks/useBookingMutate";
 import dayjs from "dayjs";
 import { useNavigationBlock } from "../../hooks/useNavigationBlock";
@@ -38,18 +41,22 @@ export default function BookingPage({}: Props) {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { user } = useAuthStore();
-	const room_id = searchParams.get("room_id");
 	const id = searchParams.get("id");
 	const [mode, _] = useState(id ? "edit" : "create");
 	const [form] = Form.useForm<Booking>();
 	const [isDirty, setIsDirty] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [errorSubmit, setErrorSubmit] = useState<string>();
+		const [room_id, setRoomId] = useState(Number(searchParams.get("room_id")))
 	const { data, isPending: isDataLoading } = useBookingById(Number(id || null));
+	const { data: dataRoomBooking, isPending: isDataRoomBookingLoading } =
+		useRoomBookingDatesByRoomId(Number(room_id || null));
 	const createBooking = useCreateBooking(() => navigate("/"));
 	const updateBooking = useUpdateBooking(() => navigate("/"));
 	const isReadOnly = mode === "view";
 	const shouldDisableForm = (mode === "edit" && isSaving) || isReadOnly;
+	const [bookedDates, setBookedDates] = useState<Date[]>([]);
+
 	// Reset form when mode or data changes
 	useEffect(() => {
 		// encryptStorage.setItem("token","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImNvbnRleHQiOiJrb25nQGdtYWlsLmNvbSIsImFjdG9yIjoiYWRtaW4iLCJpYXQiOjE3MzYzMDMxMTcsImV4cCI6MTczNjMwMzExN30.RRKzShYrUa1kT6gbLl_rXl7YzZTqbIoLyI3bt9za8BA")
@@ -104,10 +111,32 @@ export default function BookingPage({}: Props) {
 			setIsSaving(false);
 		}
 	};
+	const roomIdWatch = Form.useWatch("room_id", form);
+	useEffect(() => {
+		const fetchBookedDates = async () => {
+			const roomId = roomIdWatch;
+			if (roomId && dataRoomBooking && !isDataRoomBookingLoading) {
+				setBookedDates(dataRoomBooking.data);
+				
+				// Reset date fields when room changes
+				form.setFieldsValue({
+					book_start: dayjs(),
+					book_end: dayjs()
+				});
+			}
+		};
+	
+		fetchBookedDates();
+	}, [roomIdWatch, room_id]);
 
 	const disabledDate = (current: dayjs.Dayjs) => {
 		// Disable dates before today
-		return current && current.isBefore(dayjs().startOf("day"));
+		if (current.isBefore(dayjs().startOf("day"))) {
+			return true;
+		}
+
+		// Disable booked dates
+		return bookedDates.some((date) => dayjs(date).isSame(current, "day"));
 	};
 
 	if (!data?.data && !isDataLoading && mode !== "create") {
@@ -170,6 +199,7 @@ export default function BookingPage({}: Props) {
 							onChange={(value) => {
 								form.setFieldValue("room_id", value); // อัปเดตค่าในฟอร์ม
 								handleFormChange(); // ตรวจสอบว่าฟอร์มมีการแก้ไข
+								setRoomId(Number(value))
 							}}
 							disabled={isReadOnly}
 							placeholder="เลือกห้องประชุม"
@@ -289,7 +319,7 @@ export default function BookingPage({}: Props) {
 							>
 								<DatePicker
 									format="DD-MM-BBBB HH:mm"
-									disabledDate={disabledDate}
+									disabledDate={disabledDate as any}
 									showTime={{ defaultValue: dayjs("00:00", "HH:mm") }}
 									locale={datePickerTh}
 									className="w-full" // Make DatePicker full width
@@ -309,7 +339,7 @@ export default function BookingPage({}: Props) {
 							>
 								<DatePicker
 									format="DD-MM-BBBB HH:mm"
-									disabledDate={disabledDate}
+									disabledDate={disabledDate as any}
 									showTime={{ defaultValue: dayjs("00:00", "HH:mm") }}
 									locale={datePickerTh}
 									className="w-full" // Make DatePicker full width
@@ -346,7 +376,7 @@ export default function BookingPage({}: Props) {
 									type="primary"
 									disabled={!isDirty || isSaving}
 									loading={isSaving}
-									icon={<CheckOutlined/>}
+									icon={<CheckOutlined />}
 									title={"ยืนยันการจอง"}
 									size="large"
 									block

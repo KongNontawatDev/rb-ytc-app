@@ -16,6 +16,7 @@ import { useAuthStore } from "../auth/hooks/useAuthStore";
 import { Booking } from "../booking/types";
 import { toDateTime } from "../../utils/dateFunction";
 import { getImage } from "../room/hooks/useRoomQuery";
+import EmptyData from "../../components/common/EmptyData";
 
 type Props = {};
 
@@ -46,7 +47,7 @@ export default function History({}: Props) {
 					/>
 				</Link>
 			</Flex>
-			<Spin spinning={isPending}>
+			{data?.data.length>0?<Spin spinning={isPending}>
 				<Row gutter={[10,10]}>
 					{data?.data?.map((item: Booking) => (
 						<Col span={24}>
@@ -74,7 +75,7 @@ export default function History({}: Props) {
 						</Col>
 					))}
 				</Row>
-			</Spin>
+			</Spin>:<EmptyData/>}
 		</div>
 	);
 }

@@ -25,6 +25,21 @@ export const useBookingById = (id: number | null | undefined) => {
 	});
 };
 
+
+export const useRoomBookingDatesByRoomId = (room_id: number | null | undefined) => {
+	return useQuery({
+		queryKey: room_id ? ["booking_list_date", room_id] : ["booking_list_date"],
+		queryFn: async () => {
+			if (room_id) {
+				const { data } = await api.get(`/app/booking_list/room/booking_date/${room_id}`);
+				return data;
+			} else {
+				throw new Response("ไม่พบข้อมูลนี้", { status: 404 });
+			}
+		},
+	});
+};
+
 export const useBookingsByUserId = (user_id: number | null | undefined) => {
 	return useQuery({
 		queryKey: user_id ? ["booking_list_by_user", user_id] : ["booking_list_by_user"],
