@@ -8,51 +8,63 @@ const ProtectedRoute = () => {
   const location = useLocation()
   const { user, setAuth } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
+  const [isLiffInitialized, setIsLiffInitialized] = useState(false)
+  const [isAuthChecked, setIsAuthChecked] = useState(false)
+
+  useEffect(() => {
+    const initializeLiff = async () => {
+      try {
+        await liff.init({ liffId: import.meta.env.VITE_LIFF_ID })
+        setIsLiffInitialized(true)
+      } catch (error) {
+        console.error('LIFF initialization failed:', error)
+        setIsLoading(false)
+        setIsAuthChecked(true)
+      }
+    }
+
+    initializeLiff()
+  }, [])
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (user) {
-        setIsLoading(false)
-        return
-      }
-      // else {
-      //   const liffUser = await liff.getProfile()
-      //   const response = await api.post('/app/auth/check_register', {
-      //     line_id: liffUser.userId
-      //   })
-
-      //   if (response.status === 200 && response.data?.data) {
-      //     setAuth(response.data.data)
-      //   }
-      // }
+      if (!isLiffInitialized) return
 
       try {
-        const liffUser = await liff.getProfile()
-        const response = await api.post('/app/auth/check_register', {
-          line_id: liffUser.userId
-        })
+        if (liff.isLoggedIn()) {
+          const liffUser = await liff.getProfile()
+          const response = await api.post('/app/auth/check_register', {
+            line_id: liffUser.userId
+          })
 
-        if (response.status === 200 && response.data?.data) {
-          setAuth(response.data.data)
+          if (response.status === 200 && response.data?.data) {
+            setAuth(response.data.data)
+          }
         }
       } catch (error: any) {
         console.error('Auth check failed:', error)
       } finally {
         setIsLoading(false)
+        setIsAuthChecked(true)
       }
     }
 
-    checkAuth()
-  }, [user, setAuth])
+    if (isLiffInitialized && !isAuthChecked) {
+      checkAuth()
+    }
+  }, [isLiffInitialized, setAuth, isAuthChecked])
 
-  if (location.pathname === '/auth/register') {
+  // If we're on the register page and LIFF is initialized, allow access
+  if (location.pathname === '/auth/register' && isLiffInitialized) {
     return <Outlet />
   }
 
-  if (isLoading) {
+  // Show loading while we're initializing LIFF or checking auth
+  if (isLoading || !isAuthChecked) {
     return <div>Loading...</div>
   }
 
+  // If no user and we're not on register page, redirect to register
   if (!user) {
     return <Navigate to="/auth/register" replace />
   }
@@ -61,38 +73,3 @@ const ProtectedRoute = () => {
 }
 
 export default ProtectedRoute
-// import React, { useEffect } from "react";
-// import { Navigate, Outlet } from "react-router-dom";
-// import { useAuth } from "../../../pages/auth/hooks/useAuth";
-// import { Spin } from "antd";
-// import { encryptStorage } from "../../../libs/encryptStorage";
-
-// interface Props {
-// 	redirectPath?: string;
-// }
-
-// const ProtectedRoute: React.FC<Props> = ({ redirectPath = "/auth/login" }) => {
-// 	const { isAuthenticated, isLoading } = useAuth();
-//   // const token = encryptStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImNvbnRleHQiOiJVNzUxZTdkNzA2MWYxYTNkNzRkYjhmMTJjODgxMTFiMzciLCJhY3RvciI6InVzZXIiLCJpYXQiOjE3MzcyNjQ3ODgsImV4cCI6MTczNzI2ODM4OH0.oHLuxI-eVdqsETOEqCcRBMQaaOXvorkGtQRakebitGY');
-// 	// Show loading state while checking authentication
-// 	if (isLoading) {
-// 		return (
-// 			<Spin spinning={isLoading} fullscreen>
-// 				<div className="flex items-center justify-center min-h-screen">
-// 					<div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" />
-// 				</div>
-// 			</Spin>
-// 		);
-// 	}
-
-
-// 	// Redirect if not authenticated
-// 	// if (!isAuthenticated) {
-// 	// 	return <Navigate to={redirectPath} replace />;
-// 	// }
-
-// 	// Render child routes if authenticated
-// 	return <Outlet />;
-// };
-
-// export default ProtectedRoute;

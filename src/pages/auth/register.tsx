@@ -1,6 +1,6 @@
 import { EditOutlined } from "@ant-design/icons";
-import { Card,  Form, Input, Typography } from "antd";
-import React, { useEffect, useState } from "react";
+import { Card, Form, Input, Typography } from "antd";
+import React, { useEffect, useState, useCallback } from "react";
 import AlertSubmitFail from "../../components/common/AlertSubmitFail";
 import { useTranslation } from "react-i18next";
 import { User } from "../profile/types";
@@ -13,6 +13,7 @@ import ButtonCancel from "../../components/common/ButtonCancel";
 import ButtonSave from "../../components/common/ButtonSave";
 import { useNavigate } from "react-router-dom";
 import { getLineProfile } from "../../utils/liff";
+import liff from '@line/liff';
 
 const Register: React.FC = () => {
 	const { t } = useTranslation();
@@ -24,25 +25,41 @@ const Register: React.FC = () => {
 	const createUser = useCreateUser(() => navigate('/'));
 	const [imageFile, setImageFile] = useState<File | null>(null);
 	const [isImageRemoved, setIsImageRemoved] = useState(false);
-	const [profileLine, setProfileLine] = useState<{userId:string,displayName:string,image:string}>()
-	const lineProfile = async () => {
-		try {
-			const profile = await getLineProfile()
-			setProfileLine({
-				displayName:profile.displayName,
-				userId:profile.userId,
-				image:profile.pictureUrl||""
-			})
-		form.setFieldValue("image",profile.pictureUrl)
-		form.setFieldValue("full_name",profile.displayName)
-		} catch (error) {
-			console.error('Error fetching LINE profile:', error)
-		}
-	}
+	const [profileLine, setProfileLine] = useState<{userId:string,displayName:string,image:string}>();
 
-  useEffect(() => {
-    lineProfile()
-  }, [])
+	const lineProfile = useCallback(async () => {
+		try {
+			if (!liff.isLoggedIn()) {
+				await liff.login();
+				return;
+			}
+
+			const profile = await getLineProfile();
+			if (!profile) {
+				console.error('Could not get LINE profile');
+				return;
+			}
+
+			setProfileLine({
+				displayName: profile.displayName,
+				userId: profile.userId,
+				image: profile.pictureUrl || ""
+			});
+
+			form.setFieldsValue({
+				image: profile.pictureUrl,
+				full_name: profile.displayName
+			});
+		} catch (error) {
+			console.error('Error fetching LINE profile:', error);
+			setErrorSubmit('ไม่สามารถดึงข้อมูล LINE ได้ กรุณาลองใหม่อีกครั้ง');
+		}
+	}, [form]);
+
+	useEffect(() => {
+		lineProfile();
+	}, [lineProfile]);
+
 	const handleFormChange = () => {
 		const currentValues = form.getFieldsValue();
 		const hasChanges = JSON.stringify(currentValues) !== JSON.stringify({});
@@ -52,7 +69,6 @@ const Register: React.FC = () => {
 	useNavigationBlock(isDirty);
 	useNavigationBlockEnhanced({ isModify: isDirty });
 
-  
 	const handleCustomUpload = async ({
 		file,
 		onSuccess: onUploadSuccess,
@@ -71,10 +87,16 @@ const Register: React.FC = () => {
 	};
 
 	const handleSubmit = async (values: User) => {
+		if (!profileLine?.userId) {
+			setErrorSubmit('ไม่พบข้อมูล LINE กรุณาลองใหม่อีกครั้ง');
+			return;
+		}
+
 		try {
 			setIsSaving(true);
-			setIsDirty(false)
+			setIsDirty(false);
 			const formData = new FormData();
+
 			const convertToString = (
 				value: string | number | Date | undefined
 			): string => {
@@ -89,23 +111,25 @@ const Register: React.FC = () => {
 				}
 			});
 
-			formData.append("image", imageFile?.name?imageFile:String(profileLine?.image));
+			formData.append("image", imageFile?.name ? imageFile : String(profileLine?.image));
 			formData.append("line_name", String(profileLine?.displayName));
-			formData.append("line_id", String(profileLine?.userId));
+			formData.append("line_id", profileLine?.userId);
 
 			await createUser.mutateAsync(
 				Object.fromEntries(formData.entries()) as any
 			);
-			
 		} catch (error: any) {
 			if (error.status === 400) {
 				setErrorSubmit(error.response?.data?.message);
+			} else {
+				setErrorSubmit('เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง');
 			}
 			console.error("Failed to save user:", error);
 		} finally {
 			setIsSaving(false);
 		}
 	};
+
 	return (
 		<div className="px-4 pt-4">
 			<Card hoverable>
@@ -181,10 +205,10 @@ const Register: React.FC = () => {
 						<DepartmentDropdown
 							value={form.getFieldValue("department_id")}
 							onChange={(value) => {
-								form.setFieldValue("department_id", value); // อัปเดตค่าในฟอร์ม
-								handleFormChange(); // ตรวจสอบว่าฟอร์มมีการแก้ไข
+								form.setFieldValue("department_id", value);
+								handleFormChange();
 							}}
-              placeholder="เลือกแผนก"
+							placeholder="เลือกแผนก"
 						/>
 					</Form.Item>
 					<Form.Item
@@ -209,14 +233,14 @@ const Register: React.FC = () => {
 						/>
 					</Form.Item>
 
-						<ButtonSave
-							type="primary"
-							disabled={!isDirty || isSaving}
-							loading={isSaving}
-							title={"ลงทะเบียน"}
-							block
-              className="mb-4"
-						/>
+					<ButtonSave
+						type="primary"
+						disabled={!isDirty || isSaving}
+						loading={isSaving}
+						title={"ลงทะเบียน"}
+						block
+						className="mb-4"
+					/>
 
 					<ButtonCancel
 						type="text"

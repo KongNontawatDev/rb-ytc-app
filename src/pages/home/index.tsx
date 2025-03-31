@@ -16,9 +16,8 @@ import { Booking } from "../booking/types";
 import { toDateTime } from "../../utils/dateFunction";
 import EmptyData from "../../components/common/EmptyData";
 
-type Props = {};
 
-export default function Home({}: Props) {
+export default function Home() {
 	const authStore = useAuthStore();
 	const { token } = theme.useToken();
 	const { data: roomAll, isPending: roomAllIsPending } = useRoomAll();
@@ -41,7 +40,7 @@ export default function Home({}: Props) {
 				</Flex>
 				<Link to={"/profile"}>
 					<Image
-						src={getImage(authStore?.user?.image!, "user")}
+						src={getImage(authStore?.user?.image || '', "user")}
 						alt="image profile"
 						preview={false}
 						fallback={fallbackImage}
