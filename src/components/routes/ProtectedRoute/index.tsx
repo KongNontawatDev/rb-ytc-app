@@ -37,7 +37,7 @@ const ProtectedRoute = () => {
             line_id: liffUser.userId
           })
 
-          if (response.status === 200 && response.data?.data) {
+          if (response.data?.data) {
             setAuth(response.data.data)
           }
         }
